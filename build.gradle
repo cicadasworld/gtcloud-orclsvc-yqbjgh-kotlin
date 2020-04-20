@@ -1,0 +1,63 @@
+buildscript {
+    ext {
+    	springBootVersion = '2.1.9.RELEASE'
+    	kotlinVersion = '1.3.10'
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+    	classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
+    	classpath "org.jetbrains.kotlin:kotlin-allopen:$kotlinVersion"
+    	classpath "org.jetbrains.kotlin:kotlin-noarg:$kotlinVersion"
+        classpath "org.springframework.boot:spring-boot-gradle-plugin:$springBootVersion"
+    }
+}
+
+apply plugin: 'kotlin'
+apply plugin: 'kotlin-spring'
+apply plugin: 'kotlin-jpa'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+
+group = 'gtcloud-orclsvc-yqbjgh'
+version = '1.0.0'
+
+sourceCompatibility = 1.8
+
+ext {
+    ojdbcVersion = '11.2.0.1.0'
+    geoToolsVersion = '22.0'
+}
+
+dependencies {
+	implementation "org.jetbrains.kotlin:kotlin-reflect"
+	implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+	implementation "com.fasterxml.jackson.module:jackson-module-kotlin"
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation "com.oracle:ojdbc6:$ojdbcVersion"
+    implementation("org.geotools:gt-geojson:$geoToolsVersion") {
+        exclude group: 'javax', module: 'javaee-api'
+    }
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+repositories {
+    mavenCentral()
+}
+
+compileKotlin {
+    kotlinOptions {
+        freeCompilerArgs = ["-Xjsr305=strict"]
+        jvmTarget = "1.8"
+    }
+}
+
+compileTestKotlin {
+    kotlinOptions {
+        freeCompilerArgs = ["-Xjsr305=strict"]
+        jvmTarget = "1.8"
+    }
+}

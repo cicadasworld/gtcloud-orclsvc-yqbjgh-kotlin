@@ -1,0 +1,1 @@
+{"jlbm":"FD006701","campId":"FID01701","apartNum":"3","apartName":"FID01701_3号楼","floorArea":3299.0,"usingStatus":"在用","floorYear":"2005","floorlevelUp":20,"floorlevelDown":3,"buildingStructure":"浇筑","qualityGrade":"一级","elevatorNum":10,"sjcjsj":null,"sjcjry":null,"coorX":"116.38939442745","coorY":"39.7480001895222","coordinateId":"FDZB06701"}
