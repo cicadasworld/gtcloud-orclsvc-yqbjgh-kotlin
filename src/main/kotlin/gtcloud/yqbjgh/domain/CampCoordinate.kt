@@ -24,5 +24,7 @@ data class CampCoordinate(
     val centerX: String?,
 
     @Column(name = "CENTER_Y")
-    val centerY: String?
+    val centerY: String?,
+
+    val sjcjry: String? = ""
 )

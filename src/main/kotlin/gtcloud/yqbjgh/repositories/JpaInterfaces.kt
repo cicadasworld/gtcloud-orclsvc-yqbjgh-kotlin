@@ -13,6 +13,14 @@ interface Bdf2UserRepository : JpaRepository<Bdf2User, String> {
 
 }
 
+interface Bdf2RoleMemberRepository : JpaRepository<Bdf2RoleMember, String> {
+
+    fun findByUsername(username: String): List<Bdf2RoleMember>
+
+}
+
+interface Bdf2RoleRepository : JpaRepository<Bdf2Role, String>
+
 interface CampApartBuildingRepository : JpaRepository<CampApartBuilding, String> {
 
     fun findByCampId(campId: String): List<CampApartBuilding>
@@ -169,7 +177,9 @@ interface VCampLocationRepository : JpaRepository<VCampLocation, String>, JpaSpe
 interface VUnitInforRepository : JpaRepository<VUnitInfor, String> {
 
     @Query(value = "select t from VUnitInfor t where t.xh like :xh%")
-    fun findByXh(@Param("xh") xh: String): List<VUnitInfor>
+    fun findByXhFamily(@Param("xh") xh: String): List<VUnitInfor>
+
+    fun findByXh(xh: String): VUnitInfor
 
     fun findByUsingCampId(campId: String): List<VUnitInfor>
 
@@ -180,10 +190,22 @@ interface VUnitInforRepository : JpaRepository<VUnitInfor, String> {
 
     @Query(value = "select * from V_UNIT_INFOR where USING_CAMP_ID is not null and length(USING_CAMP_ID) > 0 order by XH", nativeQuery = true)
     fun findByUsingCampIdOrderByXh(): List<VUnitInfor>
+
+    fun findByUnitKind(unitKind: String): List<VUnitInfor>
+
+    @Query(value = "select t from VUnitInfor t where t.unitKind like :unitKind%")
+    fun findByUnitKindFamily(@Param("unitKind") unitKind: String): List<VUnitInfor>
 }
 
 interface VUseCampLocationRepository : JpaRepository<VUseCampLocation, String>, JpaSpecificationExecutor<VUseCampLocation> {
 
     @Query(value = "select t from VUseCampLocation t where t.useBdxh like :xh%")
     fun findByBdxh(@Param("xh") xh: String): List<VUseCampLocation>
+}
+
+interface CampLocationKindRepository: JpaRepository<CampLocationKind, String> {
+    fun findByCampId(campId: String): List<CampLocationKind>
+
+    @Query(value = "select t from CampLocationKind t where t.campKindNm like :nm%")
+    fun findByCampKindNm(nm: String): List<CampLocationKind>
 }

@@ -4,7 +4,9 @@ buildscript {
     	kotlinVersion = '1.3.10'
     }
     repositories {
-        mavenCentral()
+        maven {
+            url 'http://129.0.3.135:28000/maven2/'
+        }
     }
     dependencies {
     	classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
@@ -21,18 +23,20 @@ apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 
 group = 'gtcloud-orclsvc-yqbjgh'
-version = '1.0.0'
+version = '1.3.6'
 
 sourceCompatibility = 1.8
 
 ext {
     ojdbcVersion = '11.2.0.1.0'
     geoToolsVersion = '22.0'
+    kotlinxVersion = '1.0.1'
 }
 
 dependencies {
 	implementation "org.jetbrains.kotlin:kotlin-reflect"
 	implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+	implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxVersion"
 	implementation "com.fasterxml.jackson.module:jackson-module-kotlin"
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
@@ -45,7 +49,9 @@ dependencies {
 }
 
 repositories {
-    mavenCentral()
+    maven {
+        url 'http://129.0.3.135:28000/maven2/'
+    }
 }
 
 compileKotlin {

@@ -23,5 +23,4 @@ class UnitTreeController {
 
     @GetMapping("/bddwml-resident-unitkind/catalogue")
     fun getKindUnitTree(): List<UnitNode> = service.getKindUnitTree()
-
 }

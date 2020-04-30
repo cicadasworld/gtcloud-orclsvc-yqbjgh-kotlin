@@ -1,9 +1,11 @@
 package gtcloud.yqbjgh.services
 
 import gtcloud.yqbjgh.domain.StaffStatistics
+import gtcloud.yqbjgh.domain.UnitNode
 import gtcloud.yqbjgh.domain.VUnitInfor
 import gtcloud.yqbjgh.repositories.*
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
 @Service
@@ -31,15 +33,15 @@ class VUnitInforService {
 
     fun convert(vUnitInfor: VUnitInfor, unitKind: String?): VUnitInfor {
         val residentDicAdminDivision = residentDicAdminDivisionRepository
-                .findById(vUnitInfor.adminDivision ?: "").orElse(null)
+                .findByIdOrNull(vUnitInfor.adminDivision ?: "")
 
         val residentDicUnitKind = residentDicUnitKindRepository
-                .findById(vUnitInfor.unitKind ?: "").orElse(null)
+                .findByIdOrNull(vUnitInfor.unitKind ?: "")
 
         val residentDicUnitGrade = residentDicUnitGradeRepository
-                .findById(vUnitInfor.unitGrade ?: "").orElse(null)
+                .findByIdOrNull(vUnitInfor.unitGrade ?: "")
 
-        val vUnitInfors = vUnitInforRepository.findByXh(vUnitInfor.xh)
+        val vUnitInfors = vUnitInforRepository.findByXhFamily(vUnitInfor.xh)
 
         val matchedUnits = if (unitKind != null && unitKind.isNotEmpty()) {
             vUnitInfors.filter { it.unitKind == unitKind }
@@ -126,8 +128,26 @@ class VUnitInforService {
     }
 
     fun getVUnitInforByUnitKind(unitKind: String): StaffStatistics {
-        val vUnitInfors = vUnitInforRepository.findAll()
-        val matchedUnits = vUnitInfors.filter { it.unitKind!=null && it.unitKind.startsWith(unitKind)}
+        val matchedUnits = vUnitInforRepository.findByUnitKindFamily(unitKind)
         return staffStatistics(matchedUnits)
+    }
+
+    fun getRootBdnmByUnitKindNm(unitKindNm: String): List<UnitNode> {
+        val vUnitInfors = vUnitInforRepository.findByUnitKindFamily(unitKindNm)
+        val xhs = vUnitInfors.map { getRootXh(it.xh) }.distinct()
+        return xhs.map {
+            val unitInfo = vUnitInforRepository.findByXh(it)
+            UnitNode(
+                nm = unitInfo.bdnm,
+                xh = it
+            )
+        }
+    }
+
+    fun getRootXh(text: String): String {
+        if (text.length >= 4) {
+            return text.substring(0, 4)
+        }
+        return text
     }
 }

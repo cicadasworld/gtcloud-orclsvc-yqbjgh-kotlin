@@ -6,6 +6,7 @@ import gtcloud.yqbjgh.repositories.CampApartBuildingRepository
 import gtcloud.yqbjgh.repositories.CampApartUseclassRepository
 import gtcloud.yqbjgh.repositories.CampDicBarrackUseClassRepository
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
 @Service
@@ -28,12 +29,12 @@ class CampApartUseclassService {
 
     fun convert(campApartUseclass: CampApartUseclass): CampApartUseclass {
         val campApartBuilding = campApartBuildingRepository
-                .findById(campApartUseclass.apartId ?: "").orElse(null)
+                .findByIdOrNull(campApartUseclass.apartId ?: "")
         val campDicBarrackUseClass = campDicBarrackUseClassRepository
-                .findById(campApartUseclass.barrackUseClass?: "").orElse(null)
+                .findByIdOrNull(campApartUseclass.barrackUseClass?: "")
         return campApartUseclass.copy(
-                apartName = campApartBuilding.apartName, // apartId -> apartName
-                barrackUseClass = campDicBarrackUseClass.mc // barrackUseClass -> barrackUseClassÃû³Æ
+                apartName = campApartBuilding?.apartName, // apartId -> apartName
+                barrackUseClass = campDicBarrackUseClass?.mc // barrackUseClass -> barrackUseClassÃû³Æ
         )
     }
 
@@ -44,7 +45,7 @@ class CampApartUseclassService {
         val map = apartUseclasses.groupBy { it.barrackUseClass }
         return map.mapValues { (_, apartUseclasses) ->
             val set = apartUseclasses.size
-            val area = apartUseclasses.sumByDouble { it.barrackUseArea?.toDouble()!! }
+            val area = apartUseclasses.sumByDouble { it.barrackUseArea?.toDouble()?:0.0 }
             HousingStatistics(set = set, area = area)
         }
     }

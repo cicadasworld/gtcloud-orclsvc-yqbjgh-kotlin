@@ -13,10 +13,10 @@ class ContextRefreshedListener {
     lateinit var rootIdsBean: RootIdsBean
 
     @Autowired
-    lateinit var service: TxzhTsBddwmlService
+    lateinit var xhToBigUnitBean: XhToBigUnitBean
 
     @Autowired
-    lateinit var xhToBigUnitBean: XhToBigUnitBean
+    lateinit var service: TxzhTsBddwmlService
 
     @EventListener(ContextRefreshedEvent::class)
 //    @Scheduled(fixedRate = 600_000)

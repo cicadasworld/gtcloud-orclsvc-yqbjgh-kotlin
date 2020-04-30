@@ -13,6 +13,6 @@ class CampDicCampKindController {
     lateinit var service: CampDicCampKindService
 
     @GetMapping("/camp-dic-camp-kind")
-    fun getCampDicCampKindList(): List<CampDicCampKind> = service.listAll()
+    fun getCampDicCampKindList(): List<List<CampDicCampKind>> = service.listAll()
 
 }

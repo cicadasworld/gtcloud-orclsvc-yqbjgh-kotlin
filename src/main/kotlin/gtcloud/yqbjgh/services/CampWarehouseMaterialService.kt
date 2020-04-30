@@ -6,6 +6,7 @@ import gtcloud.yqbjgh.repositories.CampDicDangerousAttrRepository
 import gtcloud.yqbjgh.repositories.CampDicMaterialKindRepository
 import gtcloud.yqbjgh.repositories.CampWarehouseMaterialRepository
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
 @Service
@@ -27,10 +28,10 @@ class CampWarehouseMaterialService {
 
     fun convert(campWarehouseMaterial: CampWarehouseMaterial): CampWarehouseMaterial {
         val campDicMaterialKind = campDicMaterialKindRepository
-                .findById(campWarehouseMaterial.materialKind ?: "").orElse(null)
+                .findByIdOrNull(campWarehouseMaterial.materialKind ?: "")
 
         val campDicDangerousAttr = campDicDangerousAttrRepository
-                .findById(campWarehouseMaterial.dangerousAttr ?: "").orElse(null)
+                .findByIdOrNull(campWarehouseMaterial.dangerousAttr ?: "")
 
         return campWarehouseMaterial.copy(
                 materialKind = campDicMaterialKind?.mc,  // materialKind -> materialKindÃû³Æ

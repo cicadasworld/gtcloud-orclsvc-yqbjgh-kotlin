@@ -4,6 +4,7 @@ import gtcloud.yqbjgh.domain.CampCoordinate
 import gtcloud.yqbjgh.domain.CustomFields
 import gtcloud.yqbjgh.domain.VCampLocation
 import gtcloud.yqbjgh.repositories.CampCoordinateRepository
+import gtcloud.yqbjgh.repositories.CampLocationKindRepository
 import gtcloud.yqbjgh.repositories.TxzhTsBddwmlRepository
 import gtcloud.yqbjgh.repositories.VCampLocationRepository
 import gtcloud.yqbjgh.specification.Specifications
@@ -33,6 +34,9 @@ class VCampLocationService {
     @Autowired
     lateinit var geometryFactory: GeometryFactory
 
+    @Autowired
+    lateinit var campLocationKindRepository: CampLocationKindRepository
+
     fun queryVCampLocationByCustomFields(customFields: CustomFields): List<VCampLocation> {
         val dknm = customFields.dknm
         val dkmc = customFields.dkmc
@@ -40,6 +44,8 @@ class VCampLocationService {
         val campCode = customFields.campCode
         val detailAddress = customFields.detailAddress
         val campKind = customFields.campKind
+        val campAttr = customFields.campAttr
+        val onlyThisKind = customFields.onlyThisKind
         val adminDivision = customFields.adminDivision
         val siteKind = customFields.siteKind
         val watersupplyMode = customFields.watersupplyMode
@@ -80,7 +86,19 @@ class VCampLocationService {
                     .build()
         }
 
-        return vCampLocationRepository.findAll(spec).map { addBigUnit(it) }
+        val campLocations = vCampLocationRepository.findAll(spec)
+
+        if (campAttr.isEmpty()) return campLocations.map { addBigUnit(it) }
+
+        val campLocationKinds = campLocationKindRepository.findByCampKindNm(campAttr)
+        val matchedCampLocations = campLocationKinds
+                .mapNotNull { vCampLocationRepository.findById(it.campId).get() }
+
+        if (onlyThisKind) {
+            return matchedCampLocations.filter { campLocationKindRepository.findByCampId(it.dknm).size == 1 }
+                    .map { addBigUnit(it) }
+        }
+        return matchedCampLocations.map { addBigUnit(it) }
     }
 
     fun getByDknm(dknm: String): VCampLocation {

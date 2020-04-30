@@ -38,11 +38,11 @@ class CampLocationController {
         return restResult
     }
 
-    @GetMapping("/v-camp-location/using-camp/{bdnm}")
-    fun getVCampLocationForUsingCampByBdnm(@PathVariable bdnm: String): CampRestResult<VUseCampLocation> {
+    @GetMapping("/v-camp-location/using-camp/{bdnms}")
+    fun getVUsingCampCampLocationByUseBdnm(@PathVariable bdnms: Array<String>): CampRestResult<VUseCampLocation> {
         val restResult = CampRestResult<VUseCampLocation>()
-        val results = vUseCampLocationService.getVUsingCampCampLocationByBdnm(bdnm)
-        restResult.endpoint = "/v-camp-location/using-camp/$bdnm"
+        val results = bdnms.flatMap { vUseCampLocationService.getVUsingCampCampLocationByUseBdnm(it) }
+        restResult.endpoint = "/v-camp-location/using-camp/${bdnms.joinToString(",")}"
         restResult.campLocations = results
         return restResult
     }

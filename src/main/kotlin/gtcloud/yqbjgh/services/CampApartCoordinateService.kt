@@ -7,6 +7,7 @@ import gtcloud.yqbjgh.repositories.CampApartBuildingRepository
 import gtcloud.yqbjgh.repositories.CampApartCoordinateRepository
 import gtcloud.yqbjgh.repositories.VApartCoordinateRepository
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import java.util.*
 
@@ -30,11 +31,11 @@ class CampApartCoordinateService {
 
     fun convert(coordinate: CampApartCoordinate): CampApartCoordinateDTO {
         val apartId = coordinate.apartId
-        val campApartBuilding = campApartBuildingRepository.findById(apartId ?: "").get()
+        val campApartBuilding = campApartBuildingRepository.findByIdOrNull(apartId ?: "")
         return CampApartCoordinateDTO(
                 jlbm = coordinate.jlbm,
                 apartId = coordinate.apartId,
-                apartName = campApartBuilding.apartName,
+                apartName = campApartBuilding?.apartName,
                 coordinateNum = coordinate.coordinateNum?.toString(),
                 coorX = coordinate.coorX,
                 coorY = coordinate.coorY,
@@ -46,7 +47,9 @@ class CampApartCoordinateService {
     fun createCampApartCoordinate(dto: CampApartCoordinateDTO): CampApartCoordinateDTO {
         var jlbm = dto.jlbm
         if (jlbm == null || jlbm.isEmpty()) {
-            jlbm = UUID.randomUUID().toString().replace("-", "")
+            val time = System.currentTimeMillis()
+            val randomNum = UUID.randomUUID().toString().replace("-", "")
+            jlbm = "t${time}x$randomNum"
         }
         dto.jlbm = jlbm
         val campApartCoordinate = CampApartCoordinate(

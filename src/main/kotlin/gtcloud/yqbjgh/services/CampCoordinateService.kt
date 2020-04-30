@@ -93,7 +93,9 @@ class CampCoordinateService {
             dto.fid = fid
             dto.centerX = centroid.x.toString()
             dto.centerY = centroid.y.toString()
-            val jlbm = if (!dto.jlbm.isEmpty()) dto.jlbm else UUID.randomUUID().toString().replace("-", "")
+            val time = System.currentTimeMillis()
+            val randomNum = UUID.randomUUID().toString().replace("-", "")
+            val jlbm = "t${time}fid${fid}x$randomNum"
             val coordinate = CampCoordinate(
                 jlbm = jlbm,
                 fid = fid,
@@ -101,7 +103,8 @@ class CampCoordinateService {
                 coorX = dto.coorX,
                 coorY = dto.coorY,
                 centerX = centroid.x.toString(),
-                centerY = centroid.y.toString()
+                centerY = centroid.y.toString(),
+                sjcjry = dto.sjcjry
             )
             campCoordinateRepository.save(coordinate)
         }

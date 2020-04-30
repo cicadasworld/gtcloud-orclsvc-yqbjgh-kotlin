@@ -6,6 +6,7 @@ import gtcloud.yqbjgh.repositories.CampDicTrafieldKindRepository
 import gtcloud.yqbjgh.repositories.CampTrainingFieldRepository
 import gtcloud.yqbjgh.repositories.TxzhTsBddwmlRepository
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
 @Service
@@ -30,13 +31,13 @@ class CampTrainingFieldService {
 
     fun convert(campTrainingField: CampTrainingField): CampTrainingField {
         val txzhTsBddwml = txzhTsBddwmlRepository
-                .findById(campTrainingField.managementUnit ?: "").orElse(null)
+                .findByIdOrNull(campTrainingField.managementUnit ?: "")
 
         val campDicTrafieldKind = campDicTrafieldKindRepository
-                .findById(campTrainingField.traKind ?: "").orElse(null)
+                .findByIdOrNull(campTrainingField.traKind ?: "")
 
         val campDicTraUsingCondition = campDicTraUsingConditionRepository
-                .findById(campTrainingField.traUsingCondition ?: "").orElse(null)
+                .findByIdOrNull(campTrainingField.traUsingCondition ?: "")
 
         return campTrainingField.copy(
                 managementUnit = txzhTsBddwml?.mc,  // managementUnit -> bdÃû³Æ

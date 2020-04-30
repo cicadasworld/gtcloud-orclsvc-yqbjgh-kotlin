@@ -1,9 +1,13 @@
 package gtcloud.yqbjgh.services
 
 import gtcloud.yqbjgh.domain.UnitNode
+import gtcloud.yqbjgh.domain.VUnitInfor
 import gtcloud.yqbjgh.repositories.ResidentDicUnitKindRepository
 import gtcloud.yqbjgh.repositories.VCampLocationRepository
 import gtcloud.yqbjgh.repositories.VUnitInforRepository
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.runBlocking
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
@@ -214,7 +218,7 @@ class UnitTreeService {
         return matchedUnitTree
     }
 
-    fun getUnitKindDicTree(): List<UnitNode> {
+    private fun getUnitKindDicTree(): List<UnitNode> {
         val nmStepLen = 2
         val tree = ArrayList<UnitNode>()
         val levelToUnitNodes = HashMap<Int, UnitNode>()
@@ -228,7 +232,8 @@ class UnitTreeService {
                     xh = dicUnitKind.xh,
                     nm = nm,
                     mc = dicUnitKind.mc,
-                    bdjc = dicUnitKind.mc
+                    bdjc = dicUnitKind.mc,
+                    dicUnitKind = true
             )
             val level = nm.length / nmStepLen - 1
             if (strLastXh.isEmpty()) {
@@ -276,105 +281,88 @@ class UnitTreeService {
         return tree
     }
 
-    private fun filterNotesByUnitKind(unitNodes: MutableList<UnitNode>, unitKind: String): MutableList<UnitNode> {
-        val result = ArrayList<UnitNode>()
-        for (node in unitNodes) {
-            val children = node.children
-            if (children.isEmpty()) {
-                if (node.unitKind == unitKind) {
-                    result.add(node)
-                }
-            } else {
-                val newChildren = filterNotesByUnitKind(children, unitKind)
-                if (newChildren.isEmpty()) {
-                    if (node.unitKind == unitKind) {
-                        val newNode = UnitNode(
-                                xh = node.xh,
-                                bdjc = node.bdjc,
-                                mc = node.mc,
-                                nm = node.nm,
-                                unitKind = node.unitKind,
-                                unitKindName = node.unitKindName
-                        )
-                        newNode.children = newChildren
-                        result.add(newNode)
-                    }
-                } else {
-                    val newNode = UnitNode(
-                            xh = node.xh,
-                            bdjc = node.bdjc,
-                            mc = node.mc,
-                            nm = node.nm,
-                            unitKind = node.unitKind,
-                            unitKindName = node.unitKindName
-                    )
-                    newNode.children = newChildren
-                    result.add(newNode)
-                }
-            }
+    fun getLeafNodes(tree: List<UnitNode>): List<UnitNode> {
+        val leafNodes = ArrayList<UnitNode>()
+        for (kindNode in tree) {
+            searchLeafNodes(kindNode.children, leafNodes)
         }
-        return result
+        return leafNodes
     }
 
-    private fun getTreeByUnitKind(tree: MutableList<UnitNode>, unitKind: String): MutableList<UnitNode> {
-        val result = ArrayList<UnitNode>()
-        for (node in tree) {
+    fun searchLeafNodes(nodes: List<UnitNode>, leafs: MutableList<UnitNode>) {
+        for (node in nodes) {
             val children = node.children
             if (children.isEmpty()) {
-                if (node.unitKind == unitKind) {
-                    result.add(node)
-                }
+                leafs.add(node)
             } else {
-                val newChildren = filterNotesByUnitKind(children, unitKind)
-                if (newChildren.isEmpty()) {
-                    if (node.unitKind == unitKind) {
-                        val newNode = UnitNode(
-                                xh = node.xh,
-                                bdjc = node.bdjc,
-                                mc = node.mc,
-                                nm = node.nm,
-                                unitKind = node.unitKind,
-                                unitKindName = node.unitKindName
-                        )
-                        newNode.children = newChildren
-                        result.add(newNode)
-                    }
-                } else {
-                    val newNode = UnitNode(
-                            xh = node.xh,
-                            bdjc = node.bdjc,
-                            mc = node.mc,
-                            nm = node.nm,
-                            unitKind = node.unitKind,
-                            unitKindName = node.unitKindName
-                    )
-                    newNode.children = newChildren
-                    result.add(newNode)
-                }
-            }
-        }
-        return result
-    }
-
-    private fun filterUnitByKind(kindNodes: List<UnitNode>, unitTree: List<UnitNode>) {
-        for (kindNode in kindNodes) {
-            val children = kindNode.children
-            if (children.isEmpty()) {
-                val unitNodes = getTreeByUnitKind(unitTree.toMutableList(), kindNode.nm)
-                kindNode.children = unitNodes
-            } else {
-                filterUnitByKind(children, unitTree)
+                searchLeafNodes(children, leafs)
             }
         }
     }
 
     fun getKindUnitTree(): List<UnitNode> {
+        val allUnitInfors = vUnitInforRepository.findAllOderByXh()
+        val xhToUnitInfor = allUnitInfors.associateBy({it.xh}, {it})
         val unitKindTree = getUnitKindDicTree()
-        val unitTree = getUnitTree()
-        for (kindNode in unitKindTree) {
-            val children = kindNode.children
-            filterUnitByKind(children, unitTree)
+        val leafs = getLeafNodes(unitKindTree)
+        val deferred = leafs.map {
+            GlobalScope.async {
+                val unitKind = it.nm
+                it.children = getTreeByUnitKind(unitKind, xhToUnitInfor)
+                it
+            }
+        }
+        runBlocking {
+            deferred.map { it.await() }
         }
         return unitKindTree
+    }
+
+    private fun getTreeByUnitKind(unitKind: String, xhToUnitInfor: Map<String, VUnitInfor>): MutableList<UnitNode> {
+        val vUnitInfors = vUnitInforRepository.findByUnitKind(unitKind)
+        val xhs = vUnitInfors.flatMap { splitTextByStep(it.xh) }.distinct()
+        val nodes = xhs.mapNotNull { it ->
+            xhToUnitInfor[it]?.let { convertToNode(it) }
+        }
+        val associateNodes = associate(nodes)
+        return associateNodes.filter { it.parent == null }.toMutableList()
+    }
+
+    private fun convertToNode(unit: VUnitInfor): UnitNode {
+        return UnitNode(
+                xh = unit.xh,
+                nm = unit.bdnm,
+                mc = unit.mc,
+                bdjc = unit.bdjc,
+                parentnm = unit.parentnm,
+                unitKind = unit.unitKind,
+                unitKindName = unit.unitKindName
+        )
+    }
+
+    private fun associate(nodes: List<UnitNode>): List<UnitNode> {
+        for (i in nodes.indices) {
+            val n = nodes[i]
+            for (j in i + 1 until nodes.size) {
+                val m = nodes[j]
+                if (m.xh.startsWith(n.xh) && m.xh.length == n.xh.length + 2) {
+                    n.children.add(m)
+                    m.parent = n
+                } else if (n.xh.startsWith(m.xh) && n.xh.length == m.xh.length + 2) {
+                    m.children.add(n)
+                    n.parent = m
+                }
+            }
+        }
+        return nodes
+    }
+
+    fun splitTextByStep(text: String): List<String> {
+        val split = ArrayList<String>()
+        val size = (text.length - 4) / 2
+        for (i in 0..size) {
+            split.add(text.substring(0, 4 + 2 * i))
+        }
+        return split
     }
 }

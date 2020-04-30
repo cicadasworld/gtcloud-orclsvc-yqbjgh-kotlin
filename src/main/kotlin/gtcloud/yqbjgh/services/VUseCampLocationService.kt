@@ -19,7 +19,7 @@ class VUseCampLocationService {
     @Autowired
     lateinit var vUseCampLocationRepository: VUseCampLocationRepository
 
-    fun getVUsingCampCampLocationByBdnm(id: String): List<VUseCampLocation> {
+    fun getVUsingCampCampLocationByUseBdnm(id: String): List<VUseCampLocation> {
         val bddwml = txzhTsBddwmlRepository.findByIdOrNull(id)
         return if (bddwml == null) {
             vUseCampLocationRepository.findAll().map { addBigUnit(it) }

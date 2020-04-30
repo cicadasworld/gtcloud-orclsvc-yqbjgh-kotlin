@@ -14,5 +14,7 @@ class CampCoordinateDTO(
 
     var centerX: String? = "",
 
-    var centerY: String? = ""
+    var centerY: String? = "",
+
+    val sjcjry: String? = ""
 )

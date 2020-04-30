@@ -5,6 +5,7 @@ import gtcloud.yqbjgh.repositories.CampDicWarKindRepository
 import gtcloud.yqbjgh.repositories.CampWarehouseRepository
 import gtcloud.yqbjgh.repositories.TxzhTsBddwmlRepository
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
 @Service
@@ -26,10 +27,10 @@ class CampWarehouseService {
 
     fun convert(campWarehouse: CampWarehouse): CampWarehouse {
         val campDicWarKind = campDicWarKindRepository
-                .findById(campWarehouse.warKind ?: "").orElse(null)
+                .findByIdOrNull(campWarehouse.warKind ?: "")
 
         val txzhTsBddwml = txzhTsBddwmlRepository
-                .findById(campWarehouse.managementUnit ?: "").orElse(null)
+                .findByIdOrNull(campWarehouse.managementUnit ?: "")
 
         return campWarehouse.copy(
                 warKind = campDicWarKind?.mc,  // warKind -> warKindÃû³Æ

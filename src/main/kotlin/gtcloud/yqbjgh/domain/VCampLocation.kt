@@ -20,7 +20,7 @@ data class VCampLocation(
     val jlbm: String?,
 
     @Id
-    val dknm: String?,
+    val dknm: String,
 
     val dkmc: String?,
 

@@ -6,7 +6,8 @@ class Node(
     val bdjc: String?,
     val mc: String?,
     val xh: String,
-    val children: MutableList<Node> = ArrayList(),
+    val unitKindName: String?,
+    val children: MutableList<Node> = mutableListOf(),
     @JsonIgnore
     var parent: Node? = null
 )

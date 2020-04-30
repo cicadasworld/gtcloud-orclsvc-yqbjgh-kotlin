@@ -1,6 +1,7 @@
 package gtcloud.yqbjgh.controllers
 
 import gtcloud.yqbjgh.domain.StaffStatistics
+import gtcloud.yqbjgh.domain.UnitNode
 import gtcloud.yqbjgh.domain.VUnitInfor
 import gtcloud.yqbjgh.services.VUnitInforService
 import org.springframework.beans.factory.annotation.Autowired
@@ -31,4 +32,8 @@ class UnitInforController {
     @GetMapping("/v-unit-infor/unitkind/{unitKind}")
     fun getVUnitInforByUnitKind(@PathVariable unitKind: String): StaffStatistics =
         service.getVUnitInforByUnitKind(unitKind)
+
+    @GetMapping("/v-unit-infor/rootnm/{unitKindNm}")
+    fun getRootBdnmByUnitKindNm(@PathVariable unitKindNm: String): List<UnitNode> =
+        service.getRootBdnmByUnitKindNm(unitKindNm)
 }

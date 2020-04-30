@@ -7,6 +7,8 @@ class CustomFields(
     val campCode: String = "",
     val detailAddress: String = "",
     val campKind: String = "",
+    val campAttr: String = "",
+    val onlyThisKind: Boolean = false,
     val adminDivision: String = "",
     val siteKind: String = "",
     val watersupplyMode: String = "",

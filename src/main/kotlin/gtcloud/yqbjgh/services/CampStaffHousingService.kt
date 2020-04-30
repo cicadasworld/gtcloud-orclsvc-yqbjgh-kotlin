@@ -5,6 +5,7 @@ import gtcloud.yqbjgh.repositories.CampDicHouseStandardGradeRepository
 import gtcloud.yqbjgh.repositories.CampDicStaffKindRepository
 import gtcloud.yqbjgh.repositories.CampStaffHousingRepository
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
 @Service
@@ -26,10 +27,10 @@ class CampStaffHousingService {
 
     fun convert(campStaffHousing: CampStaffHousing): CampStaffHousing {
         val campDicHouseStandardGrade = campDicHouseStandardGradeRepository
-                .findById(campStaffHousing.houseStandardGrade ?: "").orElse(null)
+                .findByIdOrNull(campStaffHousing.houseStandardGrade ?: "")
 
         val campDicStaffKind = campDicStaffKindRepository
-                .findById(campStaffHousing.staffKind?:"").orElse(null)
+                .findByIdOrNull(campStaffHousing.staffKind?:"")
 
         return campStaffHousing.copy(
                 houseStandardGrade = campDicHouseStandardGrade?.mc,  // houseStandardGrade -> houseStandardGradeÃû³Æ

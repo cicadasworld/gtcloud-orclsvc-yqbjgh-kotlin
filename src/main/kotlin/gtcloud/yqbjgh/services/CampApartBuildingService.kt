@@ -9,6 +9,7 @@ import gtcloud.yqbjgh.domain.VApartCoordinateJson
 import gtcloud.yqbjgh.repositories.*
 import org.apache.commons.text.StringEscapeUtils
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
 @Service
@@ -42,13 +43,13 @@ class CampApartBuildingService {
 
     fun convert(campApartBuilding: CampApartBuilding): CampApartBuilding {
         val dicBuildingStructure = dicBuildingStructureRepository
-                .findById(campApartBuilding.buildingStructure?: "").orElse(null)
+                .findByIdOrNull(campApartBuilding.buildingStructure?: "")
 
         val dicQualityGrade = dicQualityGradeRepository
-                .findById(campApartBuilding.qualityGrade?:"").orElse(null)
+                .findByIdOrNull(campApartBuilding.qualityGrade?:"")
 
         val dicUsingStatus = dicUsingStatusRepository
-                .findById(campApartBuilding.usingStatus?:"").orElse(null)
+                .findByIdOrNull(campApartBuilding.usingStatus?:"")
 
         val campApartCoordinates = campApartCoordinateRepository
                 .findByApartId(campApartBuilding.jlbm)
@@ -68,7 +69,8 @@ class CampApartBuildingService {
     }
 
     fun getById(jlbm: String): CampApartBuilding {
-        return campApartBuildingRepository.findById(jlbm).get()
+        val campApartBuilding = campApartBuildingRepository.findById(jlbm).get()
+        return convert(campApartBuilding)
     }
 
     fun getAllVApartCoordinateJsons(): List<CampApartBuildingInfo> {

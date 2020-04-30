@@ -54,8 +54,10 @@ class ResidentUnitService {
         )
     }
 
-    fun getResidentUnitByCampId(campId: String): List<Node> {
-        val nodes = vUnitInforRepository.findByUsingCampId(campId)
+    fun getResidentUnitByUsingCampId(campId: String): List<Node> {
+        val vUnitInfors = vUnitInforRepository.findByUsingCampId(campId)
+        val xhs = vUnitInfors.flatMap { splitTextByStep(it.xh) }.distinct()
+        val nodes = xhs.map { vUnitInforRepository.findByXh(it) }
                 .map { convertToNode(it) }
                 .sortedBy { it.xh }
         val associateNodes = associate(nodes)
@@ -63,7 +65,7 @@ class ResidentUnitService {
     }
 
     fun convertToNode(unit: VUnitInfor): Node {
-        return Node(bdjc = unit.bdjc, mc = unit.mc, xh = unit.xh)
+        return Node(bdjc = unit.bdjc, mc = unit.mc, xh = unit.xh, unitKindName = unit.unitKindName)
     }
 
     fun associate(nodes: List<Node>): List<Node> {
@@ -71,15 +73,34 @@ class ResidentUnitService {
             val n = nodes[i]
             for (j in i + 1 until nodes.size) {
                 val m = nodes[j]
-                if (m.xh.startsWith(n.xh)) {
+                if (m.xh.startsWith(n.xh) && m.xh.length == n.xh.length + 2) {
                     n.children.add(m)
                     m.parent = n
-                } else if (n.xh.startsWith(m.xh)) {
+                } else if (n.xh.startsWith(m.xh) && n.xh.length == m.xh.length + 2) {
                     m.children.add(n)
                     n.parent = m
                 }
             }
         }
         return nodes
+    }
+
+    fun splitTextByStep(text: String): List<String> {
+        val split = ArrayList<String>()
+        val size = (text.length - 4) / 2
+        for (i in 0..size) {
+            split.add(text.substring(0, 4 + 2 * i))
+        }
+        return split
+    }
+
+    fun getResidentUnitByUsingApartNum(apartNum: String): List<Node> {
+        val vUnitInfors = vUnitInforRepository.findByUsingApartNum(apartNum)
+        val xhs = vUnitInfors.flatMap { splitTextByStep(it.xh) }.distinct()
+        val nodes = xhs.map { vUnitInforRepository.findByXh(it) }
+                .map { convertToNode(it) }
+                .sortedBy { it.xh }
+        val associateNodes = associate(nodes)
+        return associateNodes.filter { it.parent == null }
     }
 }

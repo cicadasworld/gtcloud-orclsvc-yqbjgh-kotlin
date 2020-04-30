@@ -5,6 +5,7 @@ import gtcloud.yqbjgh.repositories.CampBatgroundFacilitiesRepository
 import gtcloud.yqbjgh.repositories.CampDicBatKindRepository
 import gtcloud.yqbjgh.repositories.TxzhTsBddwmlRepository
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
 @Service
@@ -27,13 +28,13 @@ class CampBatgroundFacilitiesService {
 
     fun convert(campBatgroundFacilities: CampBatgroundFacilities): CampBatgroundFacilities {
         val batKind = campBatgroundFacilities.batKind
-        val campDicBatKind = campDicBatKindRepository.findById(batKind ?: "").get()
+        val campDicBatKind = campDicBatKindRepository.findByIdOrNull(batKind ?: "")
         val managementUnit = campBatgroundFacilities.managementUnit
-        val txzhTsBddwml = txzhTsBddwmlRepository.findById(managementUnit ?: "").get()
+        val txzhTsBddwml = txzhTsBddwmlRepository.findByIdOrNull(managementUnit ?: "")
 
         return campBatgroundFacilities.copy(
-                batKind = campDicBatKind.mc, // batKind -> batKind名称
-                managementUnit = txzhTsBddwml.mc //  managementUnit -> bd名称
+                batKind = campDicBatKind?.mc, // batKind -> batKind名称
+                managementUnit = txzhTsBddwml?.mc //  managementUnit -> bd名称
         )
     }
 }
