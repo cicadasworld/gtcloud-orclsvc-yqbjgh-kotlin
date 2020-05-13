@@ -23,7 +23,7 @@ apply plugin: 'org.springframework.boot'
 apply plugin: 'io.spring.dependency-management'
 
 group = 'gtcloud-orclsvc-yqbjgh'
-version = '1.3.6'
+version = '1.4.1'
 
 sourceCompatibility = 1.8
 

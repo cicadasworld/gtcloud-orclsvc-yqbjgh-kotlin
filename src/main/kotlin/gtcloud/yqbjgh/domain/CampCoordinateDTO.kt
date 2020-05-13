@@ -8,9 +8,9 @@ class CampCoordinateDTO(
 
     val coordinateNum: String? = "",
 
-    val coorX: String? = "",
+    val coorX: String = "",
 
-    val coorY: String? = "",
+    val coorY: String = "",
 
     var centerX: String? = "",
 

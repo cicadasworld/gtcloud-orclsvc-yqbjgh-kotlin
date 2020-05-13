@@ -44,7 +44,7 @@ class CampWarehouseMaterialService {
         val materialsGroupByMaterialKind = materials.groupBy { it.materialKind }
         return materialsGroupByMaterialKind.mapValues { (_, materials) ->
             val quantity = materials.size
-            val area = materials.sumByDouble { it.warArea?.toDouble()!! }
+            val area = materials.sumByDouble { it.warArea?.toDouble()?:0.0 }
             MaterialStatistics(quantity = quantity, area = area) }
     }
 
@@ -53,7 +53,7 @@ class CampWarehouseMaterialService {
         val materialGroupByDangerousAttr = materials.groupBy { it.dangerousAttr }
         return materialGroupByDangerousAttr.mapValues { (_, materials) ->
             val quantity = materials.size
-            val area = materials.sumByDouble { it.warArea?.toDouble()!! }
+            val area = materials.sumByDouble { it.warArea?.toDouble()?:0.0 }
             MaterialStatistics(quantity = quantity, area = area) }
     }
 }

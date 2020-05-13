@@ -25,9 +25,9 @@ class UnitInforController {
     fun getVUnitInforByCampId(@PathVariable campId: String): StaffStatistics =
         service.getVUnitInforByCampId(campId)
 
-    @GetMapping("/v-unit-infor/apartnum/{apartNum}")
-    fun getVUnitInforByApartNum(@PathVariable apartNum: String): StaffStatistics =
-        service.getVUnitInforByApartNum(apartNum)
+    @GetMapping("/v-unit-infor/apartid/{apartId}")
+    fun getVUnitInforByApartId(@PathVariable apartId: String): StaffStatistics =
+        service.getVUnitInforByApartId(apartId)
 
     @GetMapping("/v-unit-infor/unitkind/{unitKind}")
     fun getVUnitInforByUnitKind(@PathVariable unitKind: String): StaffStatistics =

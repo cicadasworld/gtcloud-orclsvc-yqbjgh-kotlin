@@ -41,8 +41,8 @@ class CampCoordinateService {
                 jlbm = coordinate.jlbm,
                 fid = coordinate.fid,
                 coordinateNum = coordinate.coordinateNum?.toString(),
-                coorX = coordinate.coorX,
-                coorY = coordinate.coorY,
+                coorX = coordinate.coorX?:"",
+                coorY = coordinate.coorY?:"",
                 centerX = coordinate.centerX,
                 centerY = coordinate.centerY
         )
@@ -81,11 +81,11 @@ class CampCoordinateService {
         this.deleteByFid(fid)
 
         // calculate centroid
-        val coords = ArrayList<Coordinate>()
+        val coords = mutableListOf<Coordinate>()
         for (dto in dtos) {
-            coords.add(Coordinate(dto.coorX!!.toDouble(), dto.coorY!!.toDouble()))
+            coords.add(Coordinate(dto.coorX.toDouble(), dto.coorY.toDouble()))
         }
-        coords.add(Coordinate(dtos[0].coorX!!.toDouble(), dtos[0].coorY!!.toDouble()))
+        coords.add(Coordinate(dtos[0].coorX.toDouble(), dtos[0].coorY.toDouble()))
         val polygon = geometryFactory.createPolygon(coords.toTypedArray())
         val centroid = polygon.centroid
 

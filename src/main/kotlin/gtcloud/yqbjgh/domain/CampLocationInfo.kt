@@ -8,5 +8,5 @@ class CampLocationInfo(
 
     var centerY: Double? = 0.0,
 
-    var points: List<CampPoint> = ArrayList()
+    var points: List<CampPoint> = listOf()
 )

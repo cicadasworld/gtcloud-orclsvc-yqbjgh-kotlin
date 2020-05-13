@@ -2,6 +2,7 @@ package gtcloud.yqbjgh.services
 
 import gtcloud.yqbjgh.domain.CampCoordinate
 import gtcloud.yqbjgh.domain.CustomFields
+import gtcloud.yqbjgh.domain.TxzhTsBddwml
 import gtcloud.yqbjgh.domain.VCampLocation
 import gtcloud.yqbjgh.repositories.CampCoordinateRepository
 import gtcloud.yqbjgh.repositories.CampLocationKindRepository
@@ -29,7 +30,7 @@ class VCampLocationService {
     lateinit var txzhTsBddwmlRepository: TxzhTsBddwmlRepository
 
     @Autowired
-    lateinit var bddwmlService: TxzhTsBddwmlService
+    lateinit var xhToBigUnit: Map<String, TxzhTsBddwml>
 
     @Autowired
     lateinit var geometryFactory: GeometryFactory
@@ -92,25 +93,39 @@ class VCampLocationService {
 
         val campLocationKinds = campLocationKindRepository.findByCampKindNm(campAttr)
         val matchedCampLocations = campLocationKinds
-                .mapNotNull { vCampLocationRepository.findById(it.campId).get() }
+                .mapNotNull { vCampLocationRepository.findByIdOrNull(it.campId) }
 
         if (onlyThisKind) {
-            return matchedCampLocations.filter { campLocationKindRepository.findByCampId(it.dknm).size == 1 }
+            return matchedCampLocations
+                    .filter { campLocationKindRepository.findByCampId(it.dknm).size == 1 }
+                    .filter { it.realorvirtual == "1" }
                     .map { addBigUnit(it) }
         }
-        return matchedCampLocations.map { addBigUnit(it) }
+        return matchedCampLocations
+                .filter { it.realorvirtual == "1" }
+                .map { addBigUnit(it) }
     }
 
     fun getByDknm(dknm: String): VCampLocation {
         return addBigUnit(vCampLocationRepository.findById(dknm).get())
     }
 
+    fun getByRelatedMainCampId(dknm: String): List<VCampLocation> {
+        return vCampLocationRepository.findByRelatedMainCampid(dknm)
+                .filter { it.dknm != dknm && it.campArea == 0f }
+                .map { addBigUnit(it) }
+    }
+
     fun getVManagedCampLocationsByBdnm(id: String): List<VCampLocation> {
         val bddwml = txzhTsBddwmlRepository.findByIdOrNull(id)
         return if (bddwml == null) {
-            vCampLocationRepository.findAll().map { addBigUnit(it) }
+            vCampLocationRepository.findAll()
+                    .filter { it.realorvirtual == "1" }
+                    .map { addBigUnit(it) }
         } else {
-            vCampLocationRepository.findByBdxh(bddwml.xh).map { addBigUnit(it) }
+            vCampLocationRepository.findByBdxh(bddwml.xh)
+                    .filter { it.realorvirtual == "1" }
+                    .map { addBigUnit(it) }
         }
     }
 
@@ -119,7 +134,10 @@ class VCampLocationService {
         val fids = campCoordinates.filter { pointIsInPolygon(polygon, it) }.map { it.fid }
 
         val vCampLocations = vCampLocationRepository.findAll()
-        return vCampLocations.filter { locationIsInFids(fids, it) }.map { addBigUnit(it) }
+        return vCampLocations
+                .filter { locationIsInFids(fids, it) }
+                .filter { it.realorvirtual == "1" }
+                .map { addBigUnit(it) }
     }
 
     fun pointIsInPolygon(polygon: Polygon, coordinate: CampCoordinate): Boolean {
@@ -136,7 +154,10 @@ class VCampLocationService {
         val campCoordinates = campCoordinateRepository.findAll()
         val fids = campCoordinates.filter { pointIsInCircle(lat, lng, radius, it) }.map { it.fid }
         val vCampLocations = vCampLocationRepository.findAll()
-        return vCampLocations.filter { locationIsInFids(fids, it) }.map { addBigUnit(it) }
+        return vCampLocations
+                .filter { locationIsInFids(fids, it) }
+                .filter { it.realorvirtual == "1" }
+                .map { addBigUnit(it) }
     }
 
     fun pointIsInCircle(lat: Double, lng: Double, radius: Double, coordinate: CampCoordinate): Boolean {
@@ -147,7 +168,13 @@ class VCampLocationService {
     }
 
     private fun addBigUnit(vCampLoaction: VCampLocation): VCampLocation {
-        val bigUnits = bddwmlService.getBigUnits(vCampLoaction.bdxh)
+        val bigUnits = getBigUnits(vCampLoaction.bdxh)
         return vCampLoaction.copy(bigUnit = bigUnits?.bdjc)
     }
+
+    private fun getBigUnits(xh: String): TxzhTsBddwml? {
+        val values = xhToBigUnit.filterKeys { xh.startsWith(it) }.values
+        return if (values.isEmpty()) null else values.first()
+    }
+
 }

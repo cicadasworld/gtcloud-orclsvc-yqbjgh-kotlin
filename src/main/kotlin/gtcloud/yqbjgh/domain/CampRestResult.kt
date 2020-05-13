@@ -4,5 +4,5 @@ class CampRestResult<T>(
 
     var endpoint: String? = "",
 
-    var campLocations: List<T> = ArrayList()
+    var campLocations: List<T> = listOf()
 )

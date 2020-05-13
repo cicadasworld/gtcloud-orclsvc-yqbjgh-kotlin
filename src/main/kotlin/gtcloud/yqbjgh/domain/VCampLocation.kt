@@ -52,5 +52,7 @@ data class VCampLocation(
 
     val fillOpacity: String?,
 
-    val realorvirtual: String?
+    val realorvirtual: String?,
+
+    val relatedMainCampid: String?
 )

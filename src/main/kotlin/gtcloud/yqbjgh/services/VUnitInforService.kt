@@ -26,6 +26,9 @@ class VUnitInforService {
     @Autowired
     lateinit var residentDicUnitGradeRepository: ResidentDicUnitGradeRepository
 
+    @Autowired
+    lateinit var campApartBuildingRepository: CampApartBuildingRepository
+
     fun getVUnitInforBybdnm(bdnm: String, unitKind: String?): VUnitInfor {
         val vUnitInfor = vUnitInforRepository.findById(bdnm).get()
         return convert(vUnitInfor, unitKind)
@@ -90,10 +93,11 @@ class VUnitInforService {
         return staffStatistics(matchedUnits)
     }
 
-    fun getVUnitInforByApartNum(apartNum: String): StaffStatistics {
-        val vUnitInfors = vUnitInforRepository.findByUsingApartNum(apartNum)
-        val bdnms = vUnitInfors.flatMap { txzhTsBddwmlRepository.findBdnmFamily(it.bdnm) }
-        val matchedUnits = bdnms.map { vUnitInforRepository.findById(it).get() }.filter { it.usingApartNum == apartNum }
+    fun getVUnitInforByApartId(apartId: String): StaffStatistics {
+        val apartBuilding = campApartBuildingRepository.findByIdOrNull(apartId)
+        val matchedUnits = vUnitInforRepository.findAll().filter {
+            it.usingCampId == apartBuilding?.campId && it.usingApartNum == apartBuilding?.apartNum
+        }
         return staffStatistics(matchedUnits)
     }
 

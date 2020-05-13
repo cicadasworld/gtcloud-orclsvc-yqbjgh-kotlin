@@ -5,6 +5,7 @@ import gtcloud.yqbjgh.domain.ResidentUnit
 import gtcloud.yqbjgh.domain.VUnitInfor
 import gtcloud.yqbjgh.repositories.*
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
 @Service
@@ -27,6 +28,9 @@ class ResidentUnitService {
 
     @Autowired
     lateinit var vUnitInforRepository: VUnitInforRepository
+
+    @Autowired
+    lateinit var campApartBuildingRepository: CampApartBuildingRepository
 
     fun getResidentUnit(bdnm: String): List<ResidentUnit> {
         return residentUnitRepository.findByBdnm(bdnm)
@@ -86,7 +90,7 @@ class ResidentUnitService {
     }
 
     fun splitTextByStep(text: String): List<String> {
-        val split = ArrayList<String>()
+        val split = mutableListOf<String>()
         val size = (text.length - 4) / 2
         for (i in 0..size) {
             split.add(text.substring(0, 4 + 2 * i))
@@ -94,9 +98,12 @@ class ResidentUnitService {
         return split
     }
 
-    fun getResidentUnitByUsingApartNum(apartNum: String): List<Node> {
-        val vUnitInfors = vUnitInforRepository.findByUsingApartNum(apartNum)
-        val xhs = vUnitInfors.flatMap { splitTextByStep(it.xh) }.distinct()
+    fun getResidentUnitByUsingApartId(apartId: String): List<Node> {
+        val apartBuilding = campApartBuildingRepository.findByIdOrNull(apartId)
+        val matchedUnits = vUnitInforRepository.findAll().filter {
+            it.usingCampId == apartBuilding?.campId && it.usingApartNum == apartBuilding?.apartNum
+        }
+        val xhs = matchedUnits.flatMap { splitTextByStep(it.xh) }.distinct()
         val nodes = xhs.map { vUnitInforRepository.findByXh(it) }
                 .map { convertToNode(it) }
                 .sortedBy { it.xh }

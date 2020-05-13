@@ -25,8 +25,8 @@ class UnitTreeService {
 
     fun getUnitTree(): List<UnitNode> {
         val xhStepLen = 2
-        val tree = ArrayList<UnitNode>()
-        val levelToUnitNodes = HashMap<Int, UnitNode>()
+        val tree = mutableListOf<UnitNode>()
+        val levelToUnitNodes = hashMapOf<Int, UnitNode>()
         val unitEntities = vUnitInforRepository.findAllOderByXh()
         var nLastLevel = 0
         var strLastXh = ""
@@ -111,7 +111,7 @@ class UnitTreeService {
     }
 
     private fun filterUnitNodes(unitNodes: List<UnitNode>, unitMap: Map<String, String>): MutableList<UnitNode> {
-        val newUnitNodes = ArrayList<UnitNode>()
+        val newUnitNodes = mutableListOf<UnitNode>()
         for (unitNode in unitNodes) {
             val children = unitNode.children
             if (children.size > 0) {
@@ -139,7 +139,7 @@ class UnitTreeService {
                                 parentnm = unitNode.parentnm,
                                 unitKind = unitNode.unitKind,
                                 unitKindName = unitNode.unitKindName,
-                                children = ArrayList()
+                                children = mutableListOf()
                         )
                         newUnitNodes.add(newUnitNode)
                     }
@@ -155,7 +155,7 @@ class UnitTreeService {
                             parentnm = unitNode.parentnm,
                             unitKind = unitNode.unitKind,
                             unitKindName = unitNode.unitKindName,
-                            children = ArrayList()
+                            children = mutableListOf()
                     )
                     newUnitNodes.add(newUnitNode)
                 }
@@ -165,7 +165,7 @@ class UnitTreeService {
     }
 
     private fun getMatchedUnitTree(unitTree: List<UnitNode>, unitMap: Map<String, String>): List<UnitNode> {
-        val matchedUnitTree = ArrayList<UnitNode>()
+        val matchedUnitTree = mutableListOf<UnitNode>()
         for (unitNode in unitTree) {
             val children = unitNode.children
             if (children.size > 0) {
@@ -193,7 +193,7 @@ class UnitTreeService {
                                 parentnm = unitNode.parentnm,
                                 unitKind = unitNode.unitKind,
                                 unitKindName = unitNode.unitKindName,
-                                children = ArrayList()
+                                children = mutableListOf()
                         )
                         matchedUnitTree.add(newUnitNode)
                     }
@@ -209,7 +209,7 @@ class UnitTreeService {
                             parentnm = unitNode.parentnm,
                             unitKind = unitNode.unitKind,
                             unitKindName = unitNode.unitKindName,
-                            children = ArrayList()
+                            children = mutableListOf()
                     )
                     matchedUnitTree.add(newUnitNode)
                 }
@@ -220,7 +220,7 @@ class UnitTreeService {
 
     private fun getUnitKindDicTree(): List<UnitNode> {
         val nmStepLen = 2
-        val tree = ArrayList<UnitNode>()
+        val tree = mutableListOf<UnitNode>()
         val levelToUnitNodes = HashMap<Int, UnitNode>()
         val dicUnitKinds = residentDicUnitKindRepository.findAllOrderByNm()
         var nLastLevel = 0
@@ -282,9 +282,14 @@ class UnitTreeService {
     }
 
     fun getLeafNodes(tree: List<UnitNode>): List<UnitNode> {
-        val leafNodes = ArrayList<UnitNode>()
+        val leafNodes = mutableListOf<UnitNode>()
         for (kindNode in tree) {
-            searchLeafNodes(kindNode.children, leafNodes)
+            val children = kindNode.children
+            if (children.isEmpty()) {
+                leafNodes.add(kindNode)
+            } else {
+                searchLeafNodes(children, leafNodes)
+            }
         }
         return leafNodes
     }
@@ -358,7 +363,7 @@ class UnitTreeService {
     }
 
     fun splitTextByStep(text: String): List<String> {
-        val split = ArrayList<String>()
+        val split = mutableListOf<String>()
         val size = (text.length - 4) / 2
         for (i in 0..size) {
             split.add(text.substring(0, 4 + 2 * i))

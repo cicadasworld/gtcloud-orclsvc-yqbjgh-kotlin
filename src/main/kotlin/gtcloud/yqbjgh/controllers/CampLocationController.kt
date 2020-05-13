@@ -48,14 +48,18 @@ class CampLocationController {
     }
 
     @GetMapping("/v-camp-location/dknm/{dknm}")
-    fun getVCampLocationByDknm(@PathVariable dknm: String): CampRestResult<VCampLocation> {
+    fun getVCampLocationByDknm(@PathVariable dknm: String,
+                               @RequestParam attached: Boolean = false): CampRestResult<VCampLocation> {
         val restResult = CampRestResult<VCampLocation>()
-        val results =  vCampLocationService.getByDknm(dknm)
+        val results = if (attached) {
+            vCampLocationService.getByRelatedMainCampId(dknm)
+        } else {
+            listOf(vCampLocationService.getByDknm(dknm))
+        }
         val endpoint = "/v-camp-location/dknm/$dknm"
         restResult.endpoint = endpoint
-        restResult.campLocations = listOf(results)
+        restResult.campLocations = results
         return restResult
-
     }
 
     @PostMapping("/v-camp-location/polygonquery")

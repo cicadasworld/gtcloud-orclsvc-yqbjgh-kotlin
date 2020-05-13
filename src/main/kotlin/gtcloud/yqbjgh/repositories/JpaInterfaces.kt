@@ -172,6 +172,14 @@ interface VCampLocationRepository : JpaRepository<VCampLocation, String>, JpaSpe
 
     @Query(value = "select distinct * from V_CAMP_LOCATION order by BDXH", nativeQuery = true)
     fun findAllOrderByBdxh(): List<VCampLocation>
+
+    fun findByRelatedMainCampid(dknm: String): List<VCampLocation>
+}
+
+interface VUseCampLocationRepository : JpaRepository<VUseCampLocation, String>, JpaSpecificationExecutor<VUseCampLocation> {
+
+    @Query(value = "select t from VUseCampLocation t where t.useBdxh like :xh%")
+    fun findByBdxh(@Param("xh") xh: String): List<VUseCampLocation>
 }
 
 interface VUnitInforRepository : JpaRepository<VUnitInfor, String> {
@@ -183,8 +191,6 @@ interface VUnitInforRepository : JpaRepository<VUnitInfor, String> {
 
     fun findByUsingCampId(campId: String): List<VUnitInfor>
 
-    fun findByUsingApartNum(apartNum: String): List<VUnitInfor>
-
     @Query(value = "select * from V_UNIT_INFOR order by XH", nativeQuery = true)
     fun findAllOderByXh(): List<VUnitInfor>
 
@@ -195,12 +201,6 @@ interface VUnitInforRepository : JpaRepository<VUnitInfor, String> {
 
     @Query(value = "select t from VUnitInfor t where t.unitKind like :unitKind%")
     fun findByUnitKindFamily(@Param("unitKind") unitKind: String): List<VUnitInfor>
-}
-
-interface VUseCampLocationRepository : JpaRepository<VUseCampLocation, String>, JpaSpecificationExecutor<VUseCampLocation> {
-
-    @Query(value = "select t from VUseCampLocation t where t.useBdxh like :xh%")
-    fun findByBdxh(@Param("xh") xh: String): List<VUseCampLocation>
 }
 
 interface CampLocationKindRepository: JpaRepository<CampLocationKind, String> {

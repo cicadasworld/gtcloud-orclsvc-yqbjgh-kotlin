@@ -34,6 +34,9 @@ class CampApartBuildingService {
     lateinit var vApartCoordinateJsonRepository: VApartCoordinateJsonRepository
 
     @Autowired
+    lateinit var campApartUseclassRepository: CampApartUseclassRepository
+
+    @Autowired
     lateinit var mapper: ObjectMapper
 
     fun getCampApartBuildingByCampId(campId: String): List<CampApartBuilding> {
@@ -58,7 +61,13 @@ class CampApartBuildingService {
              campApartCoordinates.first()
         } else null
 
+        val campApartUsecalsses = campApartUseclassRepository
+                .findByApartId(campApartBuilding.jlbm)
+
+        val floorArea = campApartUsecalsses.sumByDouble { it.barrackUseArea?.toDouble()?:0.0 }
+
         return campApartBuilding.copy(
+                floorArea = floorArea.toFloat(),  // floorArea equals sum of barrackUseArea
                 buildingStructure = dicBuildingStructure?.mc,  // buildingStructure -> buildingStructureÃû³Æ
                 qualityGrade = dicQualityGrade?.mc,  // qualityGrade -> qualityGradeÃû³Æ
                 usingStatus = dicUsingStatus?.mc,  // usingStatus -> usingStatusÃû³Æ

@@ -2,9 +2,9 @@ package gtcloud.yqbjgh.config
 
 import org.locationtech.jts.geom.GeometryFactory
 import org.springframework.context.annotation.Bean
-import org.springframework.stereotype.Component
+import org.springframework.context.annotation.Configuration
 
-@Component
+@Configuration
 class GeometryFactoryConf {
 
     @Bean

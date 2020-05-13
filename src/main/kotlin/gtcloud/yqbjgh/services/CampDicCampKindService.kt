@@ -15,10 +15,10 @@ class CampDicCampKindService {
 
         val campDicCampKinds = repository.findAll()
         val nms = campDicCampKinds.filter { it.nm.length == 2 }.map { it.nm }
-        val dicList = ArrayList<ArrayList<CampDicCampKind>>()
+        val dicList = mutableListOf<List<CampDicCampKind>>()
 
         for (nm in nms) {
-            val newCampDicCampKinds = ArrayList<CampDicCampKind>()
+            val newCampDicCampKinds = mutableListOf<CampDicCampKind>()
             for (campDicCampKind in campDicCampKinds) {
                 if (campDicCampKind.nm.startsWith(nm)) {
                     val newCampDicCampKind = CampDicCampKind(

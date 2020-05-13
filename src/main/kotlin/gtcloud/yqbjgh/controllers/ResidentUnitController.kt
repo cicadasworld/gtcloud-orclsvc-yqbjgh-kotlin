@@ -22,8 +22,8 @@ class ResidentUnitController {
     fun getResidentUnitByUsingCampId(@PathVariable campId: String): List<Node> =
         service.getResidentUnitByUsingCampId(campId)
 
-    @GetMapping("/resident-unit/apartnum/{apartNum}")
-    fun getResidentUnitByUsingApartNum(@PathVariable apartNum: String): List<Node> =
-        service.getResidentUnitByUsingApartNum(apartNum)
+    @GetMapping("/resident-unit/apartid/{apartId}")
+    fun getResidentUnitByUsingApartId(@PathVariable apartId: String): List<Node> =
+        service.getResidentUnitByUsingApartId(apartId)
 
 }
