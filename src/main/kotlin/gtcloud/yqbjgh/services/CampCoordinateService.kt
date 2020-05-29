@@ -1,9 +1,6 @@
 package gtcloud.yqbjgh.services
 
-import gtcloud.yqbjgh.domain.CampCoordinate
-import gtcloud.yqbjgh.domain.CampCoordinateDTO
-import gtcloud.yqbjgh.domain.CampLocationInfo
-import gtcloud.yqbjgh.domain.CampPoint
+import gtcloud.yqbjgh.domain.*
 import gtcloud.yqbjgh.repositories.CampCoordinateRepository
 import gtcloud.yqbjgh.repositories.CampLocationRepository
 import org.locationtech.jts.geom.Coordinate
@@ -117,13 +114,18 @@ class CampCoordinateService {
         return campCoordinates.map { convert(it) }
     }
 
-    fun getAllCampLocationInfoList(): List<CampLocationInfo> {
-        val dknms = campLocationRepository.findAllDknm()
-        return dknms.map { getCampLocationInfo(it) }
+    fun getAllCampLocationInfoList(virtual: Boolean): List<CampLocationInfo> {
+        val campLocations = if (virtual) {
+            campLocationRepository.findAllVirtualCampLocation()
+        } else {
+            campLocationRepository.findAll()
+        }
+        return campLocations.map { getCampLocationInfo(it) }
     }
 
-    fun getCampLocationInfo(fid: String): CampLocationInfo {
+    fun getCampLocationInfo(campLocation: CampLocation): CampLocationInfo {
         val result = CampLocationInfo()
+        val fid = campLocation.nm
         result.dknm = fid
         val campCoordinates = campCoordinateRepository.findByFid(fid, Sort.by("coordinateNum"))
         if (!campCoordinates.isEmpty()) {
@@ -133,6 +135,7 @@ class CampCoordinateService {
             val points = campCoordinates.map { getCampPoint(it) }
             result.points = points
         }
+        result.relatedMainCampid = campLocation.relatedMainCampid
         return result
     }
 

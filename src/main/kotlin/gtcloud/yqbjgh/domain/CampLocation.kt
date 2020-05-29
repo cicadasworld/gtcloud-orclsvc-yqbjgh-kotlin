@@ -9,13 +9,13 @@ data class CampLocation(
     @Id
     val jlbm: String,
 
-    val nm: String?,
+    val nm: String,
 
     val campWord: String?,
 
     val campCode: String?,
 
-    val campKind: String?,
+    val campKind: String,
 
     val adminDivision: String?,
 
@@ -33,5 +33,7 @@ data class CampLocation(
 
     val heatsupplyMode: String?,
 
-    val realorvirtual: String?
+    val realorvirtual: String?,
+
+    val relatedMainCampid: String?
 )

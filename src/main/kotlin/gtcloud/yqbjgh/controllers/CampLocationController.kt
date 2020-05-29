@@ -1,9 +1,7 @@
 package gtcloud.yqbjgh.controllers
 
-import gtcloud.yqbjgh.domain.CampRestResult
-import gtcloud.yqbjgh.domain.CustomFields
-import gtcloud.yqbjgh.domain.VCampLocation
-import gtcloud.yqbjgh.domain.VUseCampLocation
+import gtcloud.yqbjgh.domain.*
+import gtcloud.yqbjgh.services.CampLocationService
 import gtcloud.yqbjgh.services.VCampLocationService
 import gtcloud.yqbjgh.services.VUseCampLocationService
 import org.geotools.geojson.geom.GeometryJSON
@@ -16,6 +14,9 @@ class CampLocationController {
 
     @Autowired
     lateinit var vCampLocationService: VCampLocationService
+
+    @Autowired
+    lateinit var campLocationService: CampLocationService
 
     @Autowired
     lateinit var vUseCampLocationService: VUseCampLocationService
@@ -47,15 +48,25 @@ class CampLocationController {
         return restResult
     }
 
-    @GetMapping("/v-camp-location/dknm/{dknm}")
-    fun getVCampLocationByDknm(@PathVariable dknm: String,
-                               @RequestParam attached: Boolean = false): CampRestResult<VCampLocation> {
-        val restResult = CampRestResult<VCampLocation>()
+    @GetMapping("/camp-location/nm/{nm}")
+    fun getAttachedCampLocation(@PathVariable nm: String,
+                                @RequestParam attached: Boolean = false): CampRestResult<CampLocation> {
+        val restResult = CampRestResult<CampLocation>()
         val results = if (attached) {
-            vCampLocationService.getByRelatedMainCampId(dknm)
+            campLocationService.getByRelatedMainCampId(nm)
         } else {
-            listOf(vCampLocationService.getByDknm(dknm))
+            campLocationService.getByNm(nm)
         }
+        val endpoint = "/camp-location/nm/$nm?attached=$attached"
+        restResult.endpoint = endpoint
+        restResult.campLocations = results
+        return restResult
+    }
+
+    @GetMapping("/v-camp-location/dknm/{dknm}")
+    fun getVCampLocationByDknm(@PathVariable dknm: String): CampRestResult<VCampLocation> {
+        val restResult = CampRestResult<VCampLocation>()
+        val results = listOf(vCampLocationService.getByDknm(dknm))
         val endpoint = "/v-camp-location/dknm/$dknm"
         restResult.endpoint = endpoint
         restResult.campLocations = results

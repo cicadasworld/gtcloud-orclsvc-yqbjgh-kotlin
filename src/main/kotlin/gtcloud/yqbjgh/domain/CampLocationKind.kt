@@ -11,5 +11,5 @@ data class CampLocationKind(
 
     val campId: String,
 
-    val campKindNm: String?
+    val campKindNm: String
 )

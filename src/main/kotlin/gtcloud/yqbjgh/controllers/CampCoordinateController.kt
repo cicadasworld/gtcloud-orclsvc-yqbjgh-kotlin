@@ -35,6 +35,7 @@ class CampCoordinateController {
         service.updateCampCoordinate(jlbm, dto)
 
     @GetMapping("/camp-coordinate-json")
-    fun getAllCampLocationInfoList(): List<CampLocationInfo> =
-        service.getAllCampLocationInfoList()
+    fun getAllCampLocationInfoList(@RequestParam virtual: Boolean = false): List<CampLocationInfo> =
+        service.getAllCampLocationInfoList(virtual)
+
 }

@@ -89,9 +89,12 @@ interface CampDicWatersupplyModeRepository : JpaRepository<CampDicWatersupplyMod
 
 interface CampLocationRepository : JpaRepository<CampLocation, String> {
 
-    @Query(value = "select distinct t.nm from CampLocation t")
-    fun findAllDknm(): List<String>
+    @Query(value = "select t from CampLocation t where t.realorvirtual = '0'")
+    fun findAllVirtualCampLocation(): List<CampLocation>
 
+    fun findByRelatedMainCampid(nm: String): List<CampLocation>
+
+    fun findByNm(nm: String): List<CampLocation>
 }
 
 interface CampStaffHousingRepository : JpaRepository<CampStaffHousing, String> {
@@ -172,8 +175,6 @@ interface VCampLocationRepository : JpaRepository<VCampLocation, String>, JpaSpe
 
     @Query(value = "select distinct * from V_CAMP_LOCATION order by BDXH", nativeQuery = true)
     fun findAllOrderByBdxh(): List<VCampLocation>
-
-    fun findByRelatedMainCampid(dknm: String): List<VCampLocation>
 }
 
 interface VUseCampLocationRepository : JpaRepository<VUseCampLocation, String>, JpaSpecificationExecutor<VUseCampLocation> {
@@ -208,4 +209,7 @@ interface CampLocationKindRepository: JpaRepository<CampLocationKind, String> {
 
     @Query(value = "select t from CampLocationKind t where t.campKindNm like :nm%")
     fun findByCampKindNm(nm: String): List<CampLocationKind>
+
+    @Query(value = "select distinct t.campId from CampLocationKind t")
+    fun findDistincCampId(): List<String>
 }

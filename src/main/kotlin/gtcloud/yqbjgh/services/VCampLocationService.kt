@@ -98,11 +98,9 @@ class VCampLocationService {
         if (onlyThisKind) {
             return matchedCampLocations
                     .filter { campLocationKindRepository.findByCampId(it.dknm).size == 1 }
-                    .filter { it.realorvirtual == "1" }
                     .map { addBigUnit(it) }
         }
         return matchedCampLocations
-                .filter { it.realorvirtual == "1" }
                 .map { addBigUnit(it) }
     }
 
@@ -110,21 +108,13 @@ class VCampLocationService {
         return addBigUnit(vCampLocationRepository.findById(dknm).get())
     }
 
-    fun getByRelatedMainCampId(dknm: String): List<VCampLocation> {
-        return vCampLocationRepository.findByRelatedMainCampid(dknm)
-                .filter { it.dknm != dknm && it.campArea == 0f }
-                .map { addBigUnit(it) }
-    }
-
     fun getVManagedCampLocationsByBdnm(id: String): List<VCampLocation> {
         val bddwml = txzhTsBddwmlRepository.findByIdOrNull(id)
         return if (bddwml == null) {
             vCampLocationRepository.findAll()
-                    .filter { it.realorvirtual == "1" }
                     .map { addBigUnit(it) }
         } else {
             vCampLocationRepository.findByBdxh(bddwml.xh)
-                    .filter { it.realorvirtual == "1" }
                     .map { addBigUnit(it) }
         }
     }
@@ -136,7 +126,6 @@ class VCampLocationService {
         val vCampLocations = vCampLocationRepository.findAll()
         return vCampLocations
                 .filter { locationIsInFids(fids, it) }
-                .filter { it.realorvirtual == "1" }
                 .map { addBigUnit(it) }
     }
 
@@ -156,7 +145,6 @@ class VCampLocationService {
         val vCampLocations = vCampLocationRepository.findAll()
         return vCampLocations
                 .filter { locationIsInFids(fids, it) }
-                .filter { it.realorvirtual == "1" }
                 .map { addBigUnit(it) }
     }
 

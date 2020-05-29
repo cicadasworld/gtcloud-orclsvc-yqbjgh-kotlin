@@ -41,7 +41,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
-    implementation "com.oracle:ojdbc6:$ojdbcVersion"
+    runtimeOnly "com.oracle:ojdbc6:$ojdbcVersion"
     implementation("org.geotools:gt-geojson:$geoToolsVersion") {
         exclude group: 'javax', module: 'javaee-api'
     }
