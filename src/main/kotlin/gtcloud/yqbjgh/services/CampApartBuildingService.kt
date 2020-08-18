@@ -7,7 +7,6 @@ import gtcloud.yqbjgh.domain.CampApartBuilding
 import gtcloud.yqbjgh.domain.CampApartBuildingInfo
 import gtcloud.yqbjgh.domain.VApartCoordinateJson
 import gtcloud.yqbjgh.repositories.*
-import org.apache.commons.text.StringEscapeUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -37,7 +36,7 @@ class CampApartBuildingService {
     lateinit var campApartUseclassRepository: CampApartUseclassRepository
 
     @Autowired
-    lateinit var mapper: ObjectMapper
+    lateinit var objectMapper: ObjectMapper
 
     fun getCampApartBuildingByCampId(campId: String): List<CampApartBuilding> {
         return campApartBuildingRepository.findByCampId(campId)
@@ -89,9 +88,7 @@ class CampApartBuildingService {
 
     fun getCampApartBuildingInfo(vApartCoordinateJson: VApartCoordinateJson): CampApartBuildingInfo {
         var apartInfoStr = vApartCoordinateJson.apartInfo
-        apartInfoStr = StringEscapeUtils.unescapeJava(apartInfoStr)
-        apartInfoStr = apartInfoStr.replace(Regex("\\s*"), "")
-        val apartInfo =  mapper.readValue<ApartInfo>(apartInfoStr)
+        val apartInfo =  objectMapper.readValue<ApartInfo>(apartInfoStr)
         return CampApartBuildingInfo(
                 campId = vApartCoordinateJson.campId,
                 apartId = vApartCoordinateJson.apartId,

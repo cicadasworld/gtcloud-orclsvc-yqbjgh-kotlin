@@ -11,7 +11,7 @@ data class VApartCoordinateJson(
     @Id
     val apartId: String,
 
-    val campId: String?,
+    val campId: String,
 
-    val apartInfo: String?
+    val apartInfo: String
 )
